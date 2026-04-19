@@ -22,6 +22,8 @@ Thumbs.db
 *.log
 config.local.toml
 frames/*.gif
+frames/*.png
+frames/*.jpg
 !frames/.gitkeep
 
 # Secrets

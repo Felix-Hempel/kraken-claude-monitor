@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Kraken Quota LCD — 640×640 Mockups v2</title>
+<style>
+  :root {
+    --primary: #CC785C;
+    --bg: #141413;
+    --text: #F0EEE6;
+    --muted: #8B8680;
+    --warn: #E8A87C;
+    --danger: #C44536;
+    --success: #5C9D4F;
+    --track: #26241F;
+  }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: #0a0a09;
+    font-family: "Segoe UI", "Segoe UI Semibold", Tahoma, sans-serif;
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 64px;
+    padding: 56px 0 96px;
+  }
+
+  .mock-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+  }
+
+  .mock-label {
+    font-family: "Segoe UI", sans-serif;
+    font-size: 12px;
+    letter-spacing: 0.28em;
+    color: #6c6a65;
+    text-transform: uppercase;
+    font-weight: 700;
+  }
+
+  /* ========== 640×640 round LCD ========== */
+  .lcd {
+    position: relative;
+    width: 640px;
+    height: 640px;
+    background: var(--bg);
+    border-radius: 50%;   /* physical LCD is round — bezel masks the square framebuffer */
+    overflow: hidden;
+  }
+
+  /* Ring sits close to the edge — bigger, rounder feel.
+     Ring diameter: 600, stroke 32, centered in 640. */
+  .ring {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    width: 600px;
+    height: 600px;
+  }
+
+  /* ========== Typography ==========
+     Weights pushed to 900 for legibility at ~240px render scale + 1m distance. */
+
+  .label-top {
+    position: absolute;
+    top: 132px;
+    left: 0; right: 0;
+    text-align: center;
+    font-size: 24px;
+    letter-spacing: 0.44em;
+    font-weight: 800;
+    color: var(--muted);
+    text-indent: 0.44em; /* compensate letter-spacing for centering */
+  }
+
+  .big-num {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -62%);
+    text-align: center;
+    line-height: 0.86;
+    white-space: nowrap;
+  }
+
+  .big-num .val {
+    font-size: 228px;
+    font-weight: 900;
+    letter-spacing: -0.06em;
+    color: var(--text);
+    font-family: "Segoe UI Black", "Segoe UI", sans-serif;
+  }
+
+  .big-num .pct {
+    font-size: 74px;
+    font-weight: 900;
+    color: var(--muted);
+    margin-left: 6px;
+    vertical-align: 18px;
+    letter-spacing: -0.02em;
+  }
+
+  .sub {
+    position: absolute;
+    bottom: 112px;
+    left: 0; right: 0;
+    text-align: center;
+  }
+
+  .sub .hint {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--muted);
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 10px;
+    text-indent: 0.3em;
+  }
+
+  .sub .time {
+    font-size: 46px;
+    font-weight: 900;
+    color: var(--text);
+    letter-spacing: -0.01em;
+  }
+
+  /* ========== OVER ========== */
+  .over .big-num .val { color: var(--danger); }
+  .over .over-tag {
+    position: absolute;
+    top: 132px;
+    left: 0; right: 0;
+    text-align: center;
+    font-size: 28px;
+    font-weight: 900;
+    letter-spacing: 0.5em;
+    color: var(--danger);
+    text-indent: 0.5em;
+  }
+
+  /* ========== IDLE ========== */
+  .idle .idle-stack {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 28px;
+  }
+  .idle .idle-dot {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--muted);
+  }
+  .idle .idle-title {
+    font-size: 92px;
+    font-weight: 900;
+    color: var(--text);
+    letter-spacing: 0.02em;
+    line-height: 1;
+  }
+  .idle .idle-hint {
+    font-size: 22px;
+    letter-spacing: 0.32em;
+    color: var(--muted);
+    text-transform: uppercase;
+    font-weight: 700;
+    text-indent: 0.32em;
+  }
+  .idle .label-top { color: #4a4843; }
+
+  /* ========== PAUSED — rebuilt as single centered stack ========== */
+  .paused .pause-stack {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 34px;
+  }
+  .paused .pause-bars {
+    display: flex;
+    gap: 28px;
+  }
+  .paused .pause-bars span {
+    width: 42px;
+    height: 124px;
+    background: var(--warn);
+  }
+  .paused .pause-title {
+    font-size: 62px;
+    font-weight: 900;
+    color: var(--text);
+    letter-spacing: 0.02em;
+    line-height: 1;
+  }
+  .paused .label-top { color: var(--warn); }
+
+  .paused .pause-time {
+    position: absolute;
+    bottom: 108px;
+    left: 0; right: 0;
+    text-align: center;
+  }
+  .paused .pause-time .hint {
+    font-size: 18px;
+    letter-spacing: 0.34em;
+    color: var(--muted);
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 700;
+    text-indent: 0.34em;
+  }
+  .paused .pause-time .stamp {
+    font-size: 38px;
+    color: var(--text);
+    font-weight: 900;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.02em;
+  }
+
+  /* ========== STALE ========== */
+  .stale .big-num .val { color: var(--muted); }
+  .stale .big-num .pct { color: #5a5852; }
+  .stale .label-top { color: #4a4843; }
+  .stale .sub .time { color: var(--muted); }
+  .stale .stale-badge {
+    position: absolute;
+    bottom: 70px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 22px;
+    border: 3px solid var(--warn);
+    color: var(--warn);
+    font-size: 18px;
+    font-weight: 900;
+    letter-spacing: 0.32em;
+    text-indent: 0.32em;
+  }
+  .stale .stale-badge .sq {
+    width: 12px; height: 12px; background: var(--warn);
+  }
+
+  /* ========== Page chrome ========== */
+  .deck-title {
+    color: var(--text);
+    font-family: "Segoe UI", sans-serif;
+    font-size: 14px;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    opacity: 0.55;
+    margin-top: 48px;
+    font-weight: 700;
+  }
+  .deck-sub {
+    color: #6c6a65;
+    font-size: 12px;
+    letter-spacing: 0.22em;
+    margin-top: 6px;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+
+<div class="deck-title">Kraken LCD — Quota Display</div>
+<div class="deck-sub">640 × 640 · Round · Pillow render targets · Segoe UI only</div>
+
+<div class="page">
+
+  <!-- =========================================================
+       1. ACTIVE — 67%
+       Ring: r=284, stroke=32, C = 2π·284 ≈ 1784.6
+       67% dash = 1195.7
+       ========================================================= -->
+  <div class="mock-wrap">
+    <div class="lcd active">
+      <svg class="ring" viewBox="0 0 600 600">
+        <circle cx="300" cy="300" r="284" fill="none"
+                stroke="#26241F" stroke-width="32"/>
+        <circle cx="300" cy="300" r="284" fill="none"
+                stroke="#CC785C" stroke-width="32"
+                stroke-dasharray="1195.7 1784.6"
+                transform="rotate(-90 300 300)"
+                stroke-linecap="butt"/>
+      </svg>
+
+      <div class="label-top">CLAUDE</div>
+
+      <div class="big-num">
+        <span class="val">67</span><span class="pct">%</span>
+      </div>
+
+      <div class="sub">
+        <span class="hint">Resets in</span>
+        <span class="time">2h 38m</span>
+      </div>
+    </div>
+    <div class="mock-label">01 · ACTIVE</div>
+  </div>
+
+  <!-- =========================================================
+       2. ACTIVE OVER — 158%
+       ========================================================= -->
+  <div class="mock-wrap">
+    <div class="lcd over">
+      <svg class="ring" viewBox="0 0 600 600">
+        <circle cx="300" cy="300" r="284" fill="none"
+                stroke="#26241F" stroke-width="32"/>
+        <circle cx="300" cy="300" r="284" fill="none"
+                stroke="#C44536" stroke-width="32"
+                transform="rotate(-90 300 300)"/>
+      </svg>
+
+      <div class="over-tag">OVER</div>
+
+      <div class="big-num">
+        <span class="val">158</span><span class="pct" style="color:#C44536">%</span>
+      </div>
+
+      <div class="sub">
+        <span class="hint">Resets in</span>
+        <span class="time">1h 04m</span>
+      </div>
+    </div>
+    <div class="mock-label">02 · ACTIVE · OVER</div>
+  </div>
+
+  <!-- =========================================================
+       3. IDLE — no session
+       ========================================================= -->
+  <div class="mock-wrap">
+    <div class="lcd idle">
+      <svg class="ring" viewBox="0 0 600 600">
+        <!-- thin track -->
+        <circle cx="300" cy="300" r="284" fill="none"
+                stroke="#1F1E1B" stroke-width="14"/>
+        <!-- four cardinal notches -->
+        <line x1="300" y1="0"   x2="300" y2="24"  stroke="#3a3833" stroke-width="4"/>
+        <line x1="300" y1="576" x2="300" y2="600" stroke="#3a3833" stroke-width="4"/>
+        <line x1="0"   y1="300" x2="24"  y2="300" stroke="#3a3833" stroke-width="4"/>
+        <line x1="576" y1="300" x2="600" y2="300" stroke="#3a3833" stroke-width="4"/>
+      </svg>
+
+      <div class="label-top">CLAUDE</div>
+
+      <div class="idle-stack">
+        <div class="idle-dot"></div>
+        <div class="idle-title">IDLE</div>
+        <div class="idle-hint">No active session</div>
+      </div>
+    </div>
+    <div class="mock-label">03 · IDLE</div>
+  </div>
+
+  <!-- =========================================================
+       4. PAUSED — single clean stack, no overlap
+       ========================================================= -->
+  <div class="mock-wrap">
+    <div class="lcd paused">
+      <svg class="ring" viewBox="0 0 600 600">
+        <circle cx="300" cy="300" r="284" fill="none"
+                stroke="#26241F" stroke-width="32"/>
+        <!-- dashed warn ring — Pillow: multiple arc() calls per dash segment -->
+        <circle cx="300" cy="300" r="284" fill="none"
+                stroke="#E8A87C" stroke-width="32"
+                stroke-dasharray="44 26"
+                transform="rotate(-90 300 300)"/>
+      </svg>
+
+      <div class="label-top">PAUSED</div>
+
+      <div class="pause-stack">
+        <div class="pause-bars">
+          <span></span><span></span>
+        </div>
+        <div class="pause-title">Monitor off</div>
+      </div>
+
+      <div class="pause-time">
+        <span class="hint">Last update</span>
+        <span class="stamp">17:42</span>
+      </div>
+    </div>
+    <div class="mock-label">04 · PAUSED</div>
+  </div>
+
+  <!-- =========================================================
+       5. STALE — same value as #1, desaturated + badge
+       ========================================================= -->
+  <div class="mock-wrap">
+    <div class="lcd stale">
+      <svg class="ring" viewBox="0 0 600 600">
+        <circle cx="300" cy="300" r="284" fill="none"
+                stroke="#1F1E1B" stroke-width="32"/>
+        <circle cx="300" cy="300" r="284" fill="none"
+                stroke="#8B8680" stroke-width="32"
+                stroke-dasharray="1195.7 1784.6"
+                transform="rotate(-90 300 300)"/>
+      </svg>
+
+      <div class="label-top">CLAUDE</div>
+
+      <div class="big-num">
+        <span class="val">67</span><span class="pct">%</span>
+      </div>
+
+      <div class="sub" style="bottom:160px">
+        <span class="hint">Resets in</span>
+        <span class="time">2h 38m</span>
+      </div>
+
+      <div class="stale-badge">
+        <span class="sq"></span>
+        STALE · 4m ago
+      </div>
+    </div>
+    <div class="mock-label">05 · ACTIVE · STALE</div>
+  </div>
+
+</div>
+
+</body>
+</html>

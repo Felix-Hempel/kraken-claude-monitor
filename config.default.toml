@@ -1,0 +1,40 @@
+# kraken-claude-monitor — Default-Konfiguration
+# Kopiere nach `config.local.toml` für persönliche Overrides (wird nicht committed).
+
+[monitor]
+# Poll-Intervall in Sekunden. Minimum sinnvoll: 5s (Upload dauert 1-2s).
+poll_interval_sec = 10
+
+# LCD-Helligkeit in % (0-100). 100 für maximale Lesbarkeit unter Glas.
+brightness_pct = 100
+
+# Log-Level: DEBUG, INFO, WARNING, ERROR
+log_level = "INFO"
+
+[plan]
+# Claude-Code-Plan: "pro", "max5", "max20", "auto"
+# "auto" nutzt `ccusage --token-limit max` + `tokenLimitStatus.limit`
+# (historisches 5h-Block-Maximum) als Plan-Proxy. Fällt auf
+# session_token_limit zurück falls ccusage kein Limit ableitet.
+type = "auto"
+
+# Session-Token-Limit (5h-Block). Fallback wenn plan.type != "auto" oder
+# wenn ccusage kein detected_limit liefert. Pro ≈ 19000, Max5 ≈ 88000,
+# Max20 ≈ 220000 — aber real inkl. Cache deutlich höher (Opus-1M: ~300M+).
+session_token_limit = 19000
+
+[theme]
+# Claude-Brand-Palette (Anthropic dark + Claude Orange).
+bg_color = "#141413"
+primary_color = "#CC785C"
+text_color = "#F0EEE6"
+muted_color = "#8B8680"
+warning_color = "#E8A87C"
+danger_color = "#C44536"
+ok_color = "#5C9D4F"
+track_color = "#26241F"
+
+[oauth]
+# Sprint 3: wenn true, nutze undokumentierten OAuth-Usage-Endpoint für Weekly-Cap.
+# ccusage bleibt Fallback bei Fehlern.
+enabled = false
